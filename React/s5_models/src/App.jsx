@@ -5,7 +5,7 @@ import Experience from "./Experience";
 function App() {
   return (
     <div style={{ height: "100vh" }}>
-      <Canvas>
+      <Canvas camera={[2, 2, 5]} shadows>
         <Experience />
       </Canvas>
     </div>
