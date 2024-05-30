@@ -1,7 +1,7 @@
 import { useFrame, useLoader } from "@react-three/fiber";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { Clone, OrbitControls, Sky, useAnimations } from "@react-three/drei";
-import { Suspense, useEffect, useRef } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 
 function Experience() {
   const model = useLoader(GLTFLoader, "/Avatar.glb");
@@ -12,6 +12,7 @@ function Experience() {
 
   const queenAnimation = useAnimations(queen.animations, ladkiRef);
   const { actions } = useAnimations(ladki.animations, ladkiRef);
+  const [modelsLoaded, setModelsLoaded] = useState(false);
 
   useFrame(() => {
     if (queenRef.current) {
@@ -35,7 +36,12 @@ function Experience() {
         }, [3000]);
       }
     }
-  }, [actions]);
+  }, [actions, modelsLoaded]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setModelsLoaded(true), 2000); // 2 seconds delay
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <>
@@ -55,15 +61,19 @@ function Experience() {
           </mesh>
         }
       >
-        <primitive castShadow object={model.scene} />
+        {modelsLoaded && (
+          <>
+            <primitive ref={queenRef} position-x={1} object={queen.scene} />
+            <primitive
+              ref={ladkiRef}
+              position-x={-1}
+              position-z={3}
+              object={ladki.scene}
+            />
+            <primitive castShadow object={model.scene} />
+          </>
+        )}
       </Suspense>
-      <primitive ref={queenRef} position-x={1} object={queen.scene} />
-      <primitive
-        ref={ladkiRef}
-        position-x={-1}
-        position-z={3}
-        object={ladki.scene}
-      />
       {/* <Clone object={model.scene} scale={1.2} position-x={-2} />
       <Clone object={model.scene} scale={1.2} position-x={2} /> */}
     </>
